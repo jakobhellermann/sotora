@@ -1,4 +1,3 @@
-use bevy::render::camera::{ActiveCameras, Camera};
 use bevy::{
     diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin},
     ecs::component::Component,
@@ -22,12 +21,7 @@ mod menu;
 mod overworld;
 mod user_config;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, StageLabel)]
-pub enum Stage {
-    AppState,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum AppState {
     MainMenu,
     SettingsMenu,
@@ -39,35 +33,9 @@ pub enum AppState {
 /// Despawn all entities with given component
 ///
 /// Useful for streamlined cleanup
-///
-/// ## Camera workaround
-/// Make sure to include a `T` cleanup marker component when spawning a camera that
-/// needs to be cleaned up, otherwise the game will panic when the camera despawns.
-///
-/// This is a workaround for [Bevy issue #1452](https://github.com/bevyengine/bevy/issues/1452).
-fn despawn_all<T: Component>(
-    mut cmd: Commands,
-    query: Query<Entity, With<T>>,
-    mut cameras: ResMut<ActiveCameras>,
-    camera_query: Query<&Camera, With<T>>,
-) {
-    // FIXME workaround for https://github.com/bevyengine/bevy/issues/1452 - should be removed when the issue is fixed upstream
-    for camera in camera_query.iter() {
-        if let Some(name) = &camera.name {
-            // When a camera despawns it doesn't seem to get removed from ActiveCameras,
-            // causing a panic when the Bevy internal code tries to `unwrap` on a nonexistent
-            // entity. By manually setting the active camera to None, we make sure that Bevy
-            // doesn't try to use it.
-            //
-            // Removing this key altogether does not seem to be a good idea because it doesn't
-            // get re-added when spawning a new camera (meaning the new camera isn't activated
-            // at all).
-            cameras.cameras.insert(name.clone(), None);
-        }
-    }
-
+fn despawn_all<T: Component>(mut cmd: Commands, query: Query<Entity, With<T>>) {
     for e in query.iter() {
-        cmd.despawn_recursive(e);
+        cmd.entity(e).despawn_recursive();
     }
 }
 
@@ -98,12 +66,7 @@ fn main() {
         .add_startup_system(setup_hud_area_label.system())
         .add_system(update_hud_area_label.system())
         // AppState
-        .insert_resource(State::new(AppState::MainMenu))
-        .add_stage_before(
-            CoreStage::Update,
-            Stage::AppState,
-            StateStage::<AppState>::default(),
-        )
+        .add_state(AppState::MainMenu)
         // State Plugins
         .add_plugin(MenuPlugin)
         .add_plugin(OverworldPlugin)
@@ -113,7 +76,7 @@ fn main() {
 }
 
 fn global_setup(mut commands: Commands) {
-    commands.spawn(UiCameraBundle::default());
+    commands.spawn_bundle(UiCameraBundle::default());
 }
 
 pub struct UiAssets {

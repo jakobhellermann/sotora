@@ -3,6 +3,9 @@ name = "sotora"
 version = "0.1.0"
 edition = "2018"
 
+[features]
+editor = []
+
 [dependencies]
 directories = "3.0"
 serde = { version = "1.0", features = ["derive"] }
@@ -10,7 +13,7 @@ ron = "0.6"
 
 [dependencies.bevy]
 git = "https://github.com/bevyengine/bevy.git"
-rev = "8a9f475edb51ea45c976c000113ca55bac751f96"
+rev = "3e285d5c0bd49cf1aff11cf3848270bafdd48646"
 features = ["serialize"]
 
 [profile.dev]

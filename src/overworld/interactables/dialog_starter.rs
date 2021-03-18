@@ -20,6 +20,6 @@ pub fn interactable_start_dialog(
             sprite: dialog.sprite,
         });
 
-        state.set_next(AppState::Dialog).unwrap();
+        state.set(AppState::Dialog).unwrap();
     }
 }

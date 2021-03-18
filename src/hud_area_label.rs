@@ -182,7 +182,7 @@ pub fn update_hud_area_label(
 pub fn setup_hud_area_label(mut commands: Commands, assets: Res<HudAreaLabelAssets>) {
     commands
         // Root container at the top of the screen
-        .spawn(NodeBundle {
+        .spawn_bundle(NodeBundle {
             style: Style {
                 position_type: PositionType::Absolute,
                 position: Rect {
@@ -204,7 +204,7 @@ pub fn setup_hud_area_label(mut commands: Commands, assets: Res<HudAreaLabelAsse
         })
         .with_children(|root| {
             // Left side decorative image
-            root.spawn(ImageBundle {
+            root.spawn_bundle(ImageBundle {
                 style: Style {
                     size: Size::new(Val::Px(BORDER_WIDTH), Val::Px(BORDER_HEIGHT)),
                     ..Default::default()
@@ -212,9 +212,9 @@ pub fn setup_hud_area_label(mut commands: Commands, assets: Res<HudAreaLabelAsse
                 material: assets.hud_area_border_frames[0].clone(),
                 ..Default::default()
             })
-            .with(HudAreaLabelNode)
+            .insert(HudAreaLabelNode);
             // Text container with padding
-            .spawn(NodeBundle {
+            root.spawn_bundle(NodeBundle {
                 style: Style {
                     padding: Rect {
                         top: Val::Px(0.0),
@@ -229,7 +229,7 @@ pub fn setup_hud_area_label(mut commands: Commands, assets: Res<HudAreaLabelAsse
             })
             .with_children(|text_container| {
                 text_container
-                    .spawn(TextBundle {
+                    .spawn_bundle(TextBundle {
                         text: Text::with_section(
                             "",
                             TextStyle {
@@ -241,10 +241,10 @@ pub fn setup_hud_area_label(mut commands: Commands, assets: Res<HudAreaLabelAsse
                         ),
                         ..Default::default()
                     })
-                    .with(HudAreaLabelNode);
-            })
+                    .insert(HudAreaLabelNode);
+            });
             // Right side decorative image
-            .spawn(ImageBundle {
+            root.spawn_bundle(ImageBundle {
                 style: Style {
                     size: Size::new(Val::Px(BORDER_WIDTH), Val::Px(BORDER_HEIGHT)),
                     ..Default::default()
@@ -256,6 +256,6 @@ pub fn setup_hud_area_label(mut commands: Commands, assets: Res<HudAreaLabelAsse
                 },
                 ..Default::default()
             })
-            .with(HudAreaLabelNode);
+            .insert(HudAreaLabelNode);
         });
 }
